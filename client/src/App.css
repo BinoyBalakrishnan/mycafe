@@ -1,0 +1,82 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fff5e1;
+}
+
+.App {
+  text-align: center;
+}
+
+.menu-page, .login-page, .dashboard-page {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+}
+
+.menu-page h1, .login-page h2, .dashboard-page h2 {
+  color: #d35400;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 18px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #e67e22;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.menu-item input {
+  width: 100px;
+  margin-right: 10px;
+}
+
+.menu-item button {
+  margin-left: 8px;
+  padding: 5px 10px;
+  font-size: 14px;
+}
+.qr-page {
+  max-width: 500px;
+  margin: 50px auto;
+  text-align: center;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+}
+table-5 {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
