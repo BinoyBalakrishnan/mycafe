@@ -26,7 +26,12 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import db from './db.js'; 
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
+// Replace:
+// const bcrypt = require('bcrypt');
+// With:
+//const bcrypt = require('bcryptjs');
+
 import jwt from 'jsonwebtoken';
 import bodyParser from "body-parser";
 import nodemailer from "nodemailer";
