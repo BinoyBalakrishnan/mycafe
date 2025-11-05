@@ -2,14 +2,14 @@
   "name": "mycafe",
   "version": "1.0.0",
   "main": "server.js",
- "scripts": {
-  "start": "react-scripts start",
-  "build": "react-scripts build",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject"
-}
-,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
+    "@jridgewell/sourcemap-codec": "^1.5.5",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -19,6 +19,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.10",
     "react-router-dom": "^7.9.5",
+    "react-scripts": "5.0.1",
     "twilio": "^5.10.4",
     "xlsx": "^0.18.5"
   },
@@ -49,9 +50,19 @@
     "npm": ">=10.0.0"
   },
   "overrides": {
-  "glob": "^10.3.10",
-  "source-map": "^0.7.4",
-  "sourcemap-codec": "@jridgewell/sourcemap-codec@^1.5.0"
-}
-
+    "glob": "^10.3.10",
+    "source-map": "^0.7.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

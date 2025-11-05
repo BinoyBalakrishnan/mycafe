@@ -9,6 +9,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "dependencies": {
+    "@jridgewell/sourcemap-codec": "^1.5.5",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -48,9 +49,8 @@
     "npm": ">=10.0.0"
   },
   "overrides": {
-  "glob": "^10.3.10",
-  "source-map": "^0.7.4",
-  "sourcemap-codec": "@jridgewell/sourcemap-codec@^1.5.0"
-}
-
+    "glob": "^10.3.10",
+    "source-map": "^0.7.4"
+   
+  }
 }
