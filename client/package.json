@@ -47,10 +47,6 @@
       "last 1 safari version"
     ]
   },
-  "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.0.0"
-  },
   "devDependencies": {
     "@babel/core": "^7.28.5",
     "@babel/plugin-transform-class-properties": "^7.27.1",
@@ -68,9 +64,7 @@
     "@typescript-eslint/type-utils": "^8.46.3",
     "@typescript-eslint/utils": "^8.46.3",
     "eslint": "^9.39.1",
-    "rimraf": "^5.0.10",
     "rollup": "^4.52.5",
-    "svgo": "^2.8.0",
     "workbox-background-sync": "^7.3.0",
     "workbox-build": "^7.3.0"
   }
