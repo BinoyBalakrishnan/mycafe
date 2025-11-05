@@ -52,13 +52,23 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
+    "@babel/plugin-transform-class-properties": "^7.27.1",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.27.1",
+    "@babel/plugin-transform-numeric-separator": "^7.27.1",
     "@babel/plugin-transform-optional-chaining": "^7.28.5",
+    "@babel/plugin-transform-private-methods": "^7.27.1",
+    "@babel/plugin-transform-private-property-in-object": "^7.27.1",
     "@babel/preset-env": "^7.28.5",
+    "@eslint/config-array": "^0.21.1",
+    "@eslint/object-schema": "^2.1.7",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
     "@typescript-eslint/type-utils": "^8.46.3",
     "@typescript-eslint/utils": "^8.46.3",
-    "eslint": "^9.39.1"
+    "eslint": "^9.39.1",
+    "rimraf": "^6.1.0",
+    "rollup": "^4.52.5",
+    "workbox-background-sync": "^7.3.0",
+    "workbox-build": "^7.3.0"
   }
 }
