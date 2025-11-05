@@ -13,7 +13,6 @@
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "eslint": "^9.39.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mssql": "^12.1.0",
@@ -26,7 +25,16 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.27.1",
+    "@babel/plugin-transform-optional-chaining": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@typescript-eslint/eslint-plugin": "^8.46.3",
+    "@typescript-eslint/parser": "^8.46.3",
+    "@typescript-eslint/type-utils": "^8.46.3",
+    "@typescript-eslint/utils": "^8.46.3",
     "concurrently": "^9.2.1",
+    "eslint": "^9.39.1",
     "nodemon": "^3.1.10"
   },
   "engines": {
