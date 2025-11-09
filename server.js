@@ -13,6 +13,9 @@ import twilio from "twilio";
 
 dotenv.config();
 const app = express();
+const express = require('express');
+const cors = require('cors');
+
 
 // ✅ Setup for ES module dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -23,17 +26,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ✅ CORS FIX — must be before routes
-app.use(
-  cors({
-    origin: [
-      "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net", // frontend
-      "http://localhost:3000", // dev
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+
+app.use(cors({
+  origin: [
+    'https://purple-island-00b1be310.3.azurestaticapps.net', // your frontend
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
 app.options("*", cors());
 
 // ✅ Health check
