@@ -3,19 +3,15 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
 import db from "./db.js";
 import { fileURLToPath } from "url";
-import twilio from "twilio";
 
 dotenv.config();
-const app = express();
-const express = require('express');
-const cors = require('cors');
 
+const app = express();
 
 // ✅ Setup for ES module dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -26,14 +22,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ✅ CORS FIX — must be before routes
-
-app.use(cors({
-  origin: [
-    'https://purple-island-00b1be310.3.azurestaticapps.net', // your frontend
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "https://purple-island-00b1be310.3.azurestaticapps.net", // frontend domain
+      "http://localhost:3000", // optional for local testing
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 app.options("*", cors());
 
 // ✅ Health check
@@ -47,9 +46,9 @@ app.get("/api/test", (req, res) => {
 });
 
 // ✅ Uploads setup
-const uploadDir = path.join(process.cwd(), "uploads");
+const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(uploadDir));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
@@ -58,10 +57,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ✅ Sample routes (Menu, Orders, etc.) — keep yours as is
-// ... [your /api/data, /api/postdata, etc. routes remain unchanged]
-
-// ✅ Login API — make sure this is real logic or placeholder
+// ✅ Example Login API (CORS test)
 app.post("/api/login", async (req, res) => {
   res.json({ message: "Login OK ✅ CORS working" });
 });
@@ -81,6 +77,6 @@ if (fs.existsSync(path.join(buildPath, "index.html"))) {
 
 // ✅ Start server
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on port ${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
