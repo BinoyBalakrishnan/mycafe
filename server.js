@@ -12,10 +12,50 @@ import twilio from "twilio";
 
 dotenv.config();
 
+// const app = express();
+// app.use(cors());
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+
 const app = express();
-app.use(cors());
+
+// Get __dirname (for ES module compatibility)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ✅ Use CORS and allow only your frontend domain
+app.use(
+  cors({
+    origin: [
+      "https://purple-island-00b1be310.3.azurestaticapps.net", // Your static app
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+// ✅ Handle preflight requests globally
+app.options("*", cors());
+
+// Middleware for parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Example test route
+app.get("/api/test", (req, res) => {
+  res.json({ message: "CORS working fine ✅" });
+});
+
+// Serve React build if exists
+const buildPath = path.join(__dirname, "client", "build");
+app.use(express.static(buildPath));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(buildPath, "index.html"));
+});
+
+
 
 // ✅ Uploads folder setup
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -192,21 +232,21 @@ app.post("/api/login", async (req, res) => {
 });
 
 // ✅ Serve React App (safe fallback)
-const __dirnameResolved = path.resolve();
-const clientBuildPath = path.join(__dirnameResolved, "client", "build");
+// const __dirnameResolved = path.resolve();
+// const clientBuildPath = path.join(__dirnameResolved, "client", "build");
 
-if (fs.existsSync(path.join(clientBuildPath, "index.html"))) {
-  // Serve React build if exists
-  app.use(express.static(clientBuildPath));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(clientBuildPath, "index.html"));
-  });
-} else {
-  // Fallback if build not found
-  app.get("*", (req, res) => {
-    res.status(404).send("⚠️ React build not found. Please run `npm run build` inside the client folder.");
-  });
-}
+// if (fs.existsSync(path.join(clientBuildPath, "index.html"))) {
+//   // Serve React build if exists
+//   app.use(express.static(clientBuildPath));
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.join(clientBuildPath, "index.html"));
+//   });
+// } else {
+//   // Fallback if build not found
+//   app.get("*", (req, res) => {
+//     res.status(404).send("⚠️ React build not found. Please run `npm run build` inside the client folder.");
+//   });
+// }
 
 // ✅ Start server
 const PORT = process.env.PORT || 5001;
