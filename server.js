@@ -25,12 +25,14 @@ app.use("/uploads", express.static("uploads"));
 // ✅ Multer config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
 });
 const upload = multer({ storage });
 
-// ✅ Health check
-app.get("/api/health", (req, res) => res.json({ status: "ok", message: "Server running fine" }));
+// ✅ Health check route
+app.get("/api/health", (req, res) =>
+  res.json({ status: "ok", message: "Server running fine" })
+);
 
 // ✅ Fetch Menu Items
 app.get("/api/data", async (req, res) => {
@@ -86,9 +88,7 @@ app.delete("/api/items/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const pool = await db.poolPromise;
-    await pool.request()
-      .input("Id", db.sql.Int, id)
-      .query("DELETE FROM dbo.MenuItems WHERE Id = @Id");
+    await pool.request().input("Id", db.sql.Int, id).query("DELETE FROM dbo.MenuItems WHERE Id = @Id");
 
     res.status(200).json({ message: "Item deleted successfully" });
   } catch (err) {
@@ -108,7 +108,8 @@ app.put("/api/items/:id", async (req, res) => {
 
   try {
     const pool = await db.poolPromise;
-    const result = await pool.request()
+    const result = await pool
+      .request()
       .input("Id", db.sql.Int, id)
       .input("Name", db.sql.NVarChar(100), Name)
       .input("Description", db.sql.NVarChar(500), Description || null)
@@ -136,7 +137,8 @@ app.post("/api/regpostdata", async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const pool = await db.poolPromise;
-    await pool.request()
+    await pool
+      .request()
       .input("firstName", db.sql.VarChar, firstName)
       .input("lastName", db.sql.VarChar, lastName)
       .input("restaurantName", db.sql.VarChar, restaurantName)
@@ -163,7 +165,8 @@ app.post("/api/login", async (req, res) => {
 
   try {
     const pool = await db.poolPromise;
-    const userResult = await pool.request()
+    const userResult = await pool
+      .request()
       .input("Email", db.sql.NVarChar, email)
       .query("SELECT * FROM LoginDetails WHERE Email = @Email");
 
@@ -188,30 +191,23 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// ✅ Serve React App (Safe for Azure)
+// ✅ Serve React App (safe fallback)
 const __dirnameResolved = path.resolve();
-const buildDir = path.join(__dirnameResolved, "client", "build");
-const indexFile = path.join(buildDir, "index.html");
+const clientBuildPath = path.join(__dirnameResolved, "client", "build");
 
-if (fs.existsSync(buildDir)) {
-  app.use(express.static(buildDir));
-  console.log("✅ Serving static files from:", buildDir);
+if (fs.existsSync(path.join(clientBuildPath, "index.html"))) {
+  // Serve React build if exists
+  app.use(express.static(clientBuildPath));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(clientBuildPath, "index.html"));
+  });
 } else {
-  console.warn("⚠️  React build folder not found. Run 'npm run build' in /client before deployment.");
+  // Fallback if build not found
+  app.get("*", (req, res) => {
+    res.status(404).send("⚠️ React build not found. Please run `npm run build` inside the client folder.");
+  });
 }
 
-app.get("*", (req, res) => {
-  if (fs.existsSync(indexFile)) {
-    console.log(`📄 Serving React app for request: ${req.originalUrl}`);
-    res.sendFile(indexFile);
-  } else {
-    console.error("❌ index.html not found — React app is not built.");
-    res
-      .status(404)
-      .send("React build not found. Please build the frontend using 'npm run build' inside the client folder.");
-  }
-});
-
-// ✅ Start Server
+// ✅ Start server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

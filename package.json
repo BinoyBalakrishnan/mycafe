@@ -4,15 +4,15 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-   "start": "npm run build-client && node server.js",
+   "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
     "client-install": "npm install --prefix client",
     "client-build": "npm run build --prefix client",
     "build": "cd client && npm install && npm run build",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build-client": "npm run --prefix client build",
-    "install-client": "npm install --prefix client",
+    "install-client": "cd client && npm install",
+    "build-client": "cd client && npm run build",
     "postinstall": "npm run install-client && npm run build-client"
   },
   "dependencies": {
@@ -34,7 +34,9 @@
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.10"
   },
- "engines": {
-    "node": ">=18.x"
-  }
+"engines": {
+  "node": "22.x",
+  "npm": "10.x"
+}
+
 }
