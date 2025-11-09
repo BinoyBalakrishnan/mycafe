@@ -35,6 +35,8 @@ app.use(
 );
 app.options("*", cors());
 
+app.get("/", (req, res) => res.send("✅ Backend is running"));
+
 // ✅ Health check
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Server running fine" });
