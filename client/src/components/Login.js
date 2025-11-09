@@ -44,7 +44,7 @@ class LoginPage extends Component {
 
   handleLogin = () => {
     const { email, password } = this.state;
-    fetch("https://mycafeapp-dtacazcrfnhvakb3.centralindia-01.azurewebsites.net/api/login", {
+    fetch("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -75,7 +75,7 @@ class LoginPage extends Component {
 
   requestOtp = async () => {
     try {
-      const res = await axios.post("https://mycafeapp-dtacazcrfnhvakb3.centralindia-01.azurewebsites.net/api/requestotp", {
+      const res = await axios.post("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/requestotp", {
         mobileOrEmail: this.state.mobileOrEmail,
       });
       this.showSnackbar(res.data.message, "success");
@@ -86,7 +86,7 @@ class LoginPage extends Component {
 
   verifyOtp = async () => {
     try {
-      const res = await axios.post("https://mycafeapp-dtacazcrfnhvakb3.centralindia-01.azurewebsites.net/api/verify-otp", {
+      const res = await axios.post("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/verify-otp", {
         mobileOrEmail: this.state.mobileOrEmail,
         otp: this.state.otp,
       });

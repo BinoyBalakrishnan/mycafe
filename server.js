@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: [
-      "https://purple-island-00b1be310.3.azurestaticapps.net", // frontend
+      "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net", // frontend
       "http://localhost:3000", // dev
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
