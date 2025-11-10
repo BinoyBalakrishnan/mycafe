@@ -1,75 +1,54 @@
-name: Azure Frontend + Backend CI/CD
+name: Deploy MyCafe Full Stack App to Azure
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
-  # === FRONTEND DEPLOYMENT (Azure Static Web App) ===
-  build_and_deploy_frontend:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
-    runs-on: ubuntu-latest
-    name: Build and Deploy Frontend (React)
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          lfs: false
+  build-and-deploy:
+    runs-on: windows-latest
 
-      - name: Build React App
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      # 3️⃣ Install backend dependencies
+      - name: Install backend dependencies
+        run: |
+          npm install
+
+      # 4️⃣ Build frontend
+      - name: Build React frontend
         run: |
           cd client
           npm install
           npm run build
 
-      - name: Deploy to Azure Static Web Apps
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_PURPLE_ISLAND_00B1BE310 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          app_location: "client"          # Path to React app
-          output_location: "build"        # Build folder
-          skip_api_build: true            # Prevents it from touching backend
+      # 5️⃣ Return to root folder
+      - name: Return to root
+        run: cd ..
 
-  # === BACKEND DEPLOYMENT (Azure Web App) ===
-  deploy_backend:
-    runs-on: ubuntu-latest
-    name: Deploy Backend (Node/Express API)
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: Install Dependencies
+      # 6️⃣ Verify build
+      - name: List project structure
         run: |
-          npm install
-          echo "Installed backend dependencies."
+          echo "Verifying build..."
+          dir
+          echo "Client build contents:"
+          dir client\build
 
-      - name: Deploy to Azure WebApp (Express Server)
+      # 7️⃣ Deploy to Azure App Service
+      - name: 'Deploy to Azure WebApp'
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'mycafe'  # 👈 your Azure WebApp name
-          slot-name: 'production'
+          app-name: 'mycafe-backend-d4ddd9e2a6bfcfe7'  # 🔹 Replace with your Azure App name
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: '.'
-
-  # === CLOSE PULL REQUEST JOB ===
-  close_pull_request_job:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    name: Close Pull Request Job
-    steps:
-      - name: Close Pull Request
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_PURPLE_ISLAND_00B1BE310 }}
-          action: "close"
