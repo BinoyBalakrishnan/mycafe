@@ -1,4 +1,4 @@
-name: Deploy MyCafe Full Stack App to Azure
+name: Deploy MyCafe Full Stack App
 
 on:
   push:
@@ -7,53 +7,55 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
-    runs-on: windows-latest
+  # 🟧 Backend deployment job
+  deploy-backend:
+    name: Deploy Backend (Node.js)
+    runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
 
-      # 3️⃣ Install backend dependencies
-      - name: Install backend dependencies
+      - name: Install dependencies
         run: |
           npm install
 
-      # 4️⃣ Build frontend
-      - name: Build React frontend
+      - name: Deploy backend to Azure WebApp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'mycafebackend-a5exchb7hqbgaeag' # ✅ backend app name
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BACKEND }}
+          package: '.'
+
+  # 🟦 Frontend deployment job
+  deploy-frontend:
+    name: Deploy Frontend (React)
+    runs-on: ubuntu-latest
+    needs: deploy-backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install frontend dependencies and build
         run: |
           cd client
           npm install
           npm run build
 
-      # 5️⃣ Return to root folder
-      - name: Return to root
-        run: cd ..
-
-      # 6️⃣ Verify build
-      - name: List project structure
-        run: |
-          echo "Verifying build..."
-          dir
-          echo "Client build contents:"
-          dir client\build
-
-      # 7️⃣ Deploy to Azure App Service
-      - name: 'Deploy to Azure WebApp'
+      - name: Deploy frontend to Azure WebApp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'mycafebackend-a5exchb7hqbgaeag'  # 🔹 Replace with your Azure App name
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: '.'
-        
-
-
-
-
+          app-name: 'mycafe-drhfhchbh4gsh7dn' # ✅ frontend app name
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FRONTEND }}
+          package: 'client/build'
