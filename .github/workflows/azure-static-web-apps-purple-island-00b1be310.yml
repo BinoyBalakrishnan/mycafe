@@ -49,9 +49,10 @@ jobs:
       - name: 'Deploy to Azure WebApp'
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'mycafe-drhfhchbh4gsh7dn'  # 🔹 Replace with your Azure App name
+          app-name: 'mycafebackend-a5exchb7hqbgaeag'  # 🔹 Replace with your Azure App name
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: '.'
         
+
 
 
