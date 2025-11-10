@@ -52,5 +52,6 @@ jobs:
           app-name: 'mycafe-drhfhchbh4gsh7dn'  # 🔹 Replace with your Azure App name
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: '.'
-          slot-name: 'production'
+        
+
 
