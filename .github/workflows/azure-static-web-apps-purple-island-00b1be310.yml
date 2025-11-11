@@ -28,7 +28,7 @@ jobs:
       - name: Deploy backend to Azure WebApp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'mycafebackend-a5exchb7hqbgaeag' # ✅ backend app name
+          app-name: 'mycafebackend' # ✅ backend app name
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BACKEND }}
           package: '.'
 
@@ -59,3 +59,4 @@ jobs:
           app-name: 'mycafe-drhfhchbh4gsh7dn' # ✅ frontend app name
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FRONTEND }}
           package: 'client/build'
+
