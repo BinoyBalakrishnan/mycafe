@@ -1,62 +1,40 @@
-name: Deploy MyCafe Full Stack App
+name: Deploy Full Stack App (React + Node.js)
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  # 🟧 Backend deployment job
-  deploy-backend:
-    name: Deploy Backend (Node.js)
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-
-      - name: Install dependencies
+      # Build Frontend
+      - name: Build React App
+        working-directory: ./client
         run: |
-          npm install
-
-      - name: Deploy backend to Azure WebApp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'mycafebackend' # ✅ backend app name
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BACKEND }}
-          package: '.'
-
-  # 🟦 Frontend deployment job
-  deploy-frontend:
-    name: Deploy Frontend (React)
-    runs-on: ubuntu-latest
-    needs: deploy-backend
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-
-      - name: Install frontend dependencies and build
-        run: |
-          cd client
-          npm install
+          npm ci
           npm run build
 
-      - name: Deploy frontend to Azure WebApp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'mycafe-drhfhchbh4gsh7dn' # ✅ frontend app name
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FRONTEND }}
-          package: 'client/build'
+      # Move frontend build to backend public folder (optional)
+      - name: Copy frontend build to backend
+        run: |
+          mkdir -p ./public
+          cp -r ./client/build/* ./public/ || true
 
+      # Login to Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Deploy backend (Node.js server)
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'mycafe-backend'       # <-- replace with your Azure App name
+          package: '.'
