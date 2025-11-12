@@ -52,4 +52,4 @@ jobs:
           app-name: 'mycafe-backend'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A3097B896CCA4BD4934CE44CB351D68E }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F6B174AA2B39437FBC3AA733387DDEF7 }}
