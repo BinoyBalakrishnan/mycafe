@@ -7,34 +7,35 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Build Frontend
+      # Build React App (frontend)
       - name: Build React App
         working-directory: ./client
         run: |
           npm ci
           npm run build
 
-      # Move frontend build to backend public folder (optional)
-      - name: Copy frontend build to backend
+      # Copy frontend build to backend public folder
+      - name: Copy frontend build
         run: |
-          mkdir -p ./public
-          cp -r ./client/build/* ./public/ || true
+          if (Test-Path -Path ".\public") { Remove-Item -Recurse -Force .\public }
+          New-Item -ItemType Directory -Force -Path .\public
+          Copy-Item -Path ".\client\build\*" -Destination ".\public" -Recurse -Force
 
-      # Login to Azure
+      # Azure Login
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Deploy backend (Node.js server)
+      # Deploy backend (Node.js)
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'mycafe-backend'       # <-- replace with your Azure App name
+          app-name: 'mycafe-backend'
           package: '.'
