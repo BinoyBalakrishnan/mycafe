@@ -16,7 +16,7 @@ const app = express();
 // ✅ Setup for ES module dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+const JWT_SECRET = process.env.JWT_SECRET || "defaultsecret123";
 // ✅ Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
