@@ -32,7 +32,7 @@ class ShopDashboard extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:5000/api/OrderItemdata")
+      .get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/OrderItemdata")
       .then((response) => {
         const menuOrderItems = response.data;
         this.setState({ menuOrderItems });

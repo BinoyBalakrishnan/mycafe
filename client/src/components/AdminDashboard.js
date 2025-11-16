@@ -35,7 +35,7 @@ class AdminDashboard extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:5000/api/data")
+      .get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
       .then((response) => {
         this.setState({ menuItems: response.data });
       })
@@ -86,7 +86,7 @@ class AdminDashboard extends Component {
     if (image) formData.append("image", image);
 
     axios
-      .post("http://localhost:5000/api/postdata", formData, {
+      .post("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/postdata", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then((response) => {

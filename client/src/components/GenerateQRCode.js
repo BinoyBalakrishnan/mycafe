@@ -34,7 +34,7 @@ class MenuQRCode extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:5000/api/data")
+      .get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
       .then((response) => {
         const menuItems = response.data;
         this.setState({ menuItems });

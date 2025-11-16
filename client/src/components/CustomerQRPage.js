@@ -4,7 +4,7 @@ import { QRCodeCanvas } from "qrcode.react";
 
 class CustomerQRPage extends Component {
   render() {
-    const customerDashboardURL = "http://localhost:3000/customerdashboard"; 
+    const customerDashboardURL = "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/customerdashboard"; 
     // ⬆️ Replace with your production URL when deployed
 
     return (

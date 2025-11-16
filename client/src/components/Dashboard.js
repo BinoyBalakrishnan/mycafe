@@ -39,7 +39,7 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
-    axios.get('http://localhost:5000/api/data')
+    axios.get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
       .then(response => {
         const menuItems = response.data;
         const chartData = this.getChartData(menuItems);
@@ -72,7 +72,7 @@ class Dashboard extends Component {
     const { Name, Price, Description } = this.state.editedRow;
     if (!Name || !Price) return alert("Name and Price are required.");
 
-    axios.put(`http://localhost:5000/api/items/${id}`, { Name, Price, Description })
+    axios.put(`https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`, { Name, Price, Description })
       .then(res => {
         alert(res.data.message || 'Item updated successfully');
         const updatedItems = this.state.menuItems.map(item =>
@@ -92,7 +92,7 @@ class Dashboard extends Component {
   };
 
   deleteItem = (id) => {
-    axios.delete(`http://localhost:5000/api/items/${id}`)
+    axios.delete(`https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`)
       .then(res => {
         alert(res.data.message || 'Item deleted');
         const filtered = this.state.menuItems.filter(item => item.Id !== id);

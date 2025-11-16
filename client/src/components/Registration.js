@@ -133,7 +133,7 @@ class Registration extends Component {
   handleRegister = (e) => {
     e.preventDefault();
     if (this.validateForm()) {
-      axios.post('http://localhost:5000/api/regpostdata', {
+      axios.post("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/regpostdata", {
         firstName: this.state.firstName,
         lastName: this.state.lastName,
         restaurantName: this.state.restaurantName,

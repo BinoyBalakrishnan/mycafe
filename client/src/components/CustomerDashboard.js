@@ -35,9 +35,9 @@ class CustomerMenu extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:5000/api/data")
+      .get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
       .then((response) => {
-        const baseURL = "http://localhost:5000";
+        const baseURL = "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net";
         const menuItems = response.data.map((item) => ({
           ...item,
           ImageUrl: item.ImageUrl
@@ -119,7 +119,7 @@ class CustomerMenu extends Component {
     };
 
     axios
-      .post("http://localhost:5000/api/orderplace", orderData)
+      .post("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/orderplace", orderData)
       .then((res) => {
         if (res.data?.orderId) {
           alert(`✅ ${res.data.message}\nOrder ID: ${res.data.orderId}`);
