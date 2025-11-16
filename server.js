@@ -64,6 +64,38 @@ const upload = multer({ storage });
 //   res.json({ message: "Login OK ✅ CORS working" });
 // });
 
+// app.post("/api/login", async (req, res) => {
+//   debugger;
+//   const { email, password } = req.body;
+
+//   try {
+//     const pool = await db.poolPromise;
+//     const userResult = await pool
+//       .request()
+//       .input("Email", db.sql.NVarChar, email)
+//       .query("SELECT * FROM LoginDetails WHERE Email = @Email");
+
+//     if (userResult.recordset.length === 0) {
+//       return res.status(400).json({ message: "User not found" });
+//     }
+
+//     const user = userResult.recordset[0];
+//     const isMatch = await bcrypt.compare(password, user.PasswordHash);
+
+//     if (!isMatch) {
+//       return res.status(400).json({ message: "Invalid email or password" });
+//     }
+
+//     const role = user.Role || "user";
+//     const token = jwt.sign({ userId: user.Id, role }, JWT_SECRET, { expiresIn: "1h" });
+
+//     res.json({ message: "Login successful", token, role, email: user.Email });
+//   } catch (err) {
+//     console.error("Login error:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -79,9 +111,9 @@ app.post("/api/login", async (req, res) => {
     }
 
     const user = userResult.recordset[0];
-    const isMatch = await bcrypt.compare(password, user.PasswordHash);
 
-    if (!isMatch) {
+    // ❗ Plain-text password check
+    if (password !== user.PasswordHash) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
