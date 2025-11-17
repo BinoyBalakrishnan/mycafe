@@ -92,10 +92,10 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.get("/api/data", async (req, res) => {
-    debugger;
+  
   try {
     const pool = await db.poolPromise;
-    const result = await pool.request().query('SELECT * FROM dbo.MenuItems');
+    const result = await pool.request().query("SELECT * FROM dbo.MenuItems");
     res.json(result.recordset);
   } catch (err) {
     console.error('Error fetching items:', err);

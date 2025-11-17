@@ -111,6 +111,14 @@ class AdminDashboard extends Component {
   goDashboard = () => {
     this.props.navigate("/dashboard");
   };
+  handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("email");
+
+  this.props.navigate("/login");
+};
+
 
   render() {
     const {
@@ -281,6 +289,26 @@ class AdminDashboard extends Component {
                 onClick={this.goDashboard}
               >
                 Go to Dashboard
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Button
+                variant="outlined"
+                color="secondary"
+                fullWidth
+                size="large"
+                sx={{
+                  borderRadius: 3,
+                  py: 1.5,
+                  fontWeight: "bold",
+                  "&:hover": {
+                    backgroundColor: "#fce4ec",
+                    transform: "scale(1.03)",
+                  },
+                }}
+                onClick={this.handleLogout}
+              >
+                Log Out
               </Button>
             </Grid>
           </Grid>

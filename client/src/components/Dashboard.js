@@ -41,7 +41,9 @@ class Dashboard extends Component {
   componentDidMount() {
     axios.get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
       .then(response => {
-        const menuItems = response.data;
+       // const menuItems = response.data;
+        const menuItems = Array.isArray(response.data)? response.data : response.data.items || response.data.data || [];
+
         const chartData = this.getChartData(menuItems);
         this.setState({ menuItems, chartData });
       })
