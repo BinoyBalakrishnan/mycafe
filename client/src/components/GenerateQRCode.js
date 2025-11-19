@@ -17,10 +17,10 @@ import {
   CardContent,
   Divider,
 } from "@mui/material";
+
 import { QRCodeCanvas } from "qrcode.react";
 import { withNavigation } from "./withNavigation";
 import { blockBrowserBack } from "./BackButtonHelper";
-import jsPDF from "jspdf";
 
 class MenuQRCode extends Component {
   cleanupBackBlock = null;
@@ -31,14 +31,16 @@ class MenuQRCode extends Component {
       menuItems: [],
       showQR: false,
     };
-    this.qrRef = React.createRef();
   }
 
   componentDidMount() {
     axios
       .get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
       .then((response) => {
-        const menuItems = response.data;
+        const menuItems = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || response.data.items || [];
+
         this.setState({ menuItems });
       })
       .catch((error) => {
@@ -53,49 +55,14 @@ class MenuQRCode extends Component {
   };
 
   goBack = () => {
-    this.props.navigate("/dashboard");
-  };
-
-  // 📌 Download QR as PNG
-  downloadQRImage = () => {
-    const canvas = this.qrRef.current.querySelector("canvas");
-    const pngUrl = canvas.toDataURL("image/png");
-
-    const link = document.createElement("a");
-    link.href = pngUrl;
-    link.download = "MenuQRCode.png";
-    link.click();
-  };
-
-  // 📌 Download QR as PDF
-  downloadPDF = () => {
-    const canvas = this.qrRef.current.querySelector("canvas");
-    const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "pt",
-      format: "a4",
-    });
-
-    // Branding Logo
-    pdf.addImage("/assets/logo.png", "PNG", 40, 30, 80, 80);
-
-    pdf.setFontSize(22);
-    pdf.text("MyCafe - Digital Menu QR Code", 140, 70);
-
-    pdf.setFontSize(12);
-    pdf.text("Scan this QR code to view the live menu.", 140, 95);
-
-    // QR Code Center in PDF
-    pdf.addImage(imgData, "PNG", 150, 150, 250, 250);
-
-    pdf.save("MenuQRCode.pdf");
+    this.props.navigate("/admindashboard");
   };
 
   render() {
     const { menuItems, showQR } = this.state;
-    const qrData = JSON.stringify(menuItems);
+
+    // Recommended: QR should hold Menu page URL, not huge JSON  
+    const qrData = "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/generateQR";
 
     return (
       <Container maxWidth="lg" sx={{ mt: 6, mb: 8 }}>
@@ -108,15 +75,7 @@ class MenuQRCode extends Component {
               "linear-gradient(135deg, #f3f4f6 0%, #ffffff 50%, #f9fafb 100%)",
           }}
         >
-          {/* Branding Header */}
-          <Box display="flex" justifyContent="center" mb={2}>
-            <img
-              src="/assets/logo.png"
-              alt="Restaurant Logo"
-              style={{ width: 90, height: 90, borderRadius: 12 }}
-            />
-          </Box>
-
+          {/* Header */}
           <Typography
             variant="h4"
             align="center"
@@ -127,7 +86,7 @@ class MenuQRCode extends Component {
               textShadow: "1px 1px 2px #bbb",
             }}
           >
-            🍴 MyCafe Menu Overview
+            🍴 Menu Overview with QR Code
           </Typography>
 
           <Divider sx={{ my: 3 }} />
@@ -149,6 +108,7 @@ class MenuQRCode extends Component {
                   <TableCell><b>Price (₹)</b></TableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {menuItems.length > 0 ? (
                   menuItems.map((item) => (
@@ -179,7 +139,7 @@ class MenuQRCode extends Component {
             </Table>
           </Box>
 
-          {/* Buttons Section */}
+          {/* Buttons */}
           <Grid container spacing={2} justifyContent="center" sx={{ mt: 4 }}>
             <Grid item>
               <Button
@@ -195,8 +155,6 @@ class MenuQRCode extends Component {
                   boxShadow: 4,
                   "&:hover": {
                     transform: "scale(1.05)",
-                    transition: "0.2s ease",
-                    boxShadow: 6,
                   },
                 }}
               >
@@ -215,10 +173,6 @@ class MenuQRCode extends Component {
                   py: 1.5,
                   borderRadius: 3,
                   fontWeight: "bold",
-                  "&:hover": {
-                    backgroundColor: "#e3f2fd",
-                    transform: "scale(1.03)",
-                  },
                 }}
               >
                 Back to Dashboard
@@ -226,7 +180,7 @@ class MenuQRCode extends Component {
             </Grid>
           </Grid>
 
-          {/* QR Display */}
+          {/* QR Code Section */}
           {showQR && (
             <Card
               elevation={5}
@@ -239,48 +193,25 @@ class MenuQRCode extends Component {
               }}
             >
               <CardContent>
-                <Typography variant="h6" gutterBottom fontWeight="bold">
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  fontWeight="bold"
+                  color="text.secondary"
+                >
                   📱 Scan this QR to view menu
                 </Typography>
 
-                <Box
-                  ref={this.qrRef}
-                  display="flex"
-                  justifyContent="center"
-                  sx={{ mt: 2 }}
-                >
+                <Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
                   <QRCodeCanvas
                     value={qrData}
-                    size={200}
+                    size={220}
                     bgColor="#ffffff"
                     fgColor="#1976d2"
                     level="H"
                     includeMargin={true}
                   />
                 </Box>
-
-                {/* Download Buttons */}
-                <Grid container spacing={2} justifyContent="center" mt={3}>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={this.downloadQRImage}
-                    >
-                      Download as Image
-                    </Button>
-                  </Grid>
-
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={this.downloadPDF}
-                    >
-                      Download as PDF
-                    </Button>
-                  </Grid>
-                </Grid>
               </CardContent>
             </Card>
           )}
