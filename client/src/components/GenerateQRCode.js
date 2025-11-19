@@ -62,7 +62,7 @@ class MenuQRCode extends Component {
     const { menuItems, showQR } = this.state;
 
     // Recommended: QR should hold Menu page URL, not huge JSON  
-    const qrData = "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/generateQR";
+    const qrData = "https://purple-island-00b1be310.3.azurestaticapps.net/CustomerDashboard";
 
     return (
       <Container maxWidth="lg" sx={{ mt: 6, mb: 8 }}>
