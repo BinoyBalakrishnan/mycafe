@@ -105,6 +105,13 @@ class CustomerMenu extends Component {
   toggleCart = (open) => {
     this.setState({ cartOpen: open });
   };
+logout = () => {
+  // Clear any saved session if needed
+  localStorage.clear();
+
+  // Navigate back to login page
+  this.props.navigate("/");
+};
 
   placeOrder = () => {
     const { cart } = this.state;
@@ -147,7 +154,7 @@ class CustomerMenu extends Component {
       >
         <Container>
           {/* Header */}
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          {/* <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
             <Typography
               variant="h4"
               fontWeight="bold"
@@ -177,7 +184,59 @@ class CustomerMenu extends Component {
                 <ShoppingCartIcon fontSize="large" />
               </Badge>
             </IconButton>
-          </Box>
+          </Box> */}
+
+<Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+  <Typography
+    variant="h4"
+    fontWeight="bold"
+    color="primary"
+    sx={{ textShadow: "1px 1px 2px rgba(0,0,0,0.1)" }}
+  >
+    🍽️ MyCafe Menu
+  </Typography>
+
+  <Box display="flex" alignItems="center">
+    {/* Cart Button */}
+    <IconButton
+      color="primary"
+      onClick={() => this.toggleCart(true)}
+      sx={{
+        position: "relative",
+        background: "#fff",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+        "&:hover": { backgroundColor: "#f0f0f0" },
+      }}
+    >
+      <Badge
+        badgeContent={this.state.cart.length}
+        color="error"
+        sx={{ "& .MuiBadge-badge": { fontSize: "0.75rem" } }}
+      >
+        <ShoppingCartIcon fontSize="large" />
+      </Badge>
+    </IconButton>
+
+    {/* Logout Button */}
+    <Button
+      variant="contained"
+      color="error"
+      onClick={this.logout}
+      sx={{
+        ml: 2,
+        borderRadius: 3,
+        textTransform: "none",
+        fontWeight: "bold",
+        background: "linear-gradient(90deg, #d32f2f, #f44336)",
+        "&:hover": {
+          background: "linear-gradient(90deg, #f44336, #d32f2f)",
+        },
+      }}
+    >
+      🚪 Logout
+    </Button>
+  </Box>
+</Box>
 
           {/* Menu Grid */}
           <Grid container spacing={3}>
