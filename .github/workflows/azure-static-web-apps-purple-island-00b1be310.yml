@@ -1,4 +1,4 @@
-name: Deploy Full Stack App (React + Node.js)
+name: Deploy Frontend to Azure Static Web App
 
 on:
   push:
@@ -6,36 +6,24 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
-    runs-on: windows-latest
-
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    name: Build and Deploy Frontend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      # Build React App (frontend)
       - name: Build React App
         working-directory: ./client
         run: |
-          npm ci
+          npm install
           npm run build
 
-      # Copy frontend build to backend public folder
-      - name: Copy frontend build
-        run: |
-          if (Test-Path -Path ".\public") { Remove-Item -Recurse -Force .\public }
-          New-Item -ItemType Directory -Force -Path .\public
-          Copy-Item -Path ".\client\build\*" -Destination ".\public" -Recurse -Force
-
-      # Azure Login
-      - name: Azure Login
-        uses: azure/login@v1
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # Deploy backend (Node.js)
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'mycafe-backend'
-          package: '.'
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "client"
+          output_location: "build"
+          api_location: ""
