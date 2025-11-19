@@ -116,7 +116,7 @@ class AdminDashboard extends Component {
   localStorage.removeItem("role");
   localStorage.removeItem("email");
 
-  this.props.navigate("/login");
+  this.props.navigate("/");
 };
 
 
