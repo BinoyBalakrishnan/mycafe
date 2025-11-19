@@ -23,7 +23,7 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { withNavigation } from './withNavigation';
-import { blockBrowserBack } from "./BackButtonHelper';
+import { blockBrowserBack } from './BackButtonHelper';
 
 // --- COMPONENT ---
 class Dashboard extends Component {
