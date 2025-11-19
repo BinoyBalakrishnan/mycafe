@@ -70,28 +70,90 @@ class Dashboard extends Component {
   gogenerateQR = () => this.props.navigate("/generateQR");
   goBack = () => this.props.navigate("/admindashboard");
 
-  handleSave = (id) => {
-    const { Name, Price, Description } = this.state.editedRow;
-    if (!Name || !Price) return alert("Name and Price are required.");
+  // handleSave = (id) => {
+  //   const { Name, Price, Description } = this.state.editedRow;
+  //   if (!Name || !Price) return alert("Name and Price are required.");
 
-    axios.put(`https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`, { Name, Price, Description })
-      .then(res => {
-        alert(res.data.message || 'Item updated successfully');
-        const updatedItems = this.state.menuItems.map(item =>
-          item.Id === id ? { ...item, Name, Price, Description } : item
-        );
-        this.setState({
-          menuItems: updatedItems,
-          editRowId: null,
-          editedRow: {},
-          chartData: this.getChartData(updatedItems)
-        });
-      })
-      .catch(err => {
-        console.error('Update error:', err);
-        alert('Failed to update item.');
+  //   axios.put(`https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`, { Name, Price, Description })
+  //     .then(res => {
+  //       alert(res.data.message || 'Item updated successfully');
+  //       const updatedItems = this.state.menuItems.map(item =>
+  //         item.Id === id ? { ...item, Name, Price, Description } : item
+  //       );
+  //       this.setState({
+  //         menuItems: updatedItems,
+  //         editRowId: null,
+  //         editedRow: {},
+  //         chartData: this.getChartData(updatedItems)
+  //       });
+  //     })
+  //     .catch(err => {
+  //       console.error('Update error:', err);
+  //       alert('Failed to update item.');
+  //     });
+  // };
+
+  handleSave = (id) => {
+  const { Name, Price, Description, ImageFile } = this.state.editedRow;
+  if (!Name || !Price) return alert("Name and Price are required.");
+
+  const formData = new FormData();
+  formData.append("Name", Name);
+  formData.append("Price", Price);
+  formData.append("Description", Description || "");
+  
+  if (ImageFile) {
+    formData.append("Image", ImageFile);
+  }
+
+  axios.put(
+    `https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  )
+    .then((res) => {
+      alert(res.data.message || "Item updated successfully");
+
+      const updatedItems = this.state.menuItems.map((item) =>
+        item.Id === id
+          ? { 
+              ...item, 
+              Name, 
+              Price, 
+              Description,
+              ImageUrl: res.data.imageUrl || item.ImageUrl  // backend returns image path
+            }
+          : item
+      );
+
+      this.setState({
+        menuItems: updatedItems,
+        editRowId: null,
+        editedRow: {},
+        chartData: this.getChartData(updatedItems)
       });
-  };
+    })
+    .catch((err) => {
+      console.error("Update error:", err);
+      alert("Failed to update item.");
+    });
+};
+
+
+handleImageSelect = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const previewUrl = URL.createObjectURL(file);
+
+  this.setState({
+    editedRow: {
+      ...this.state.editedRow,
+      ImageFile: file,
+      previewImage: previewUrl,
+    }
+  });
+};
 
   deleteItem = (id) => {
     axios.delete(`https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`)
@@ -219,6 +281,50 @@ class Dashboard extends Component {
                       <TextField name="Description" value={editedRow.Description || ''} onChange={this.handleChange} size="small" />
                     ) : row.Description}
                   </TableCell>
+                  <TableCell>
+                    {editRowId === row.Id ? (
+                       <>
+                   {editedRow.previewImage ? (
+                      <img 
+                          src={editedRow.previewImage} 
+                          alt="preview" 
+                          width={60} 
+                          height={60} 
+                          style={{ borderRadius: 8, marginBottom: 5 }}
+                       />
+                   ) : row.ImageUrl ? (
+        <img 
+          src={row.ImageUrl} 
+          alt={row.Name} 
+          width={60} 
+          height={60} 
+          style={{ borderRadius: 8, marginBottom: 5 }}
+        />
+      ) : null}
+
+      <Button variant="outlined" component="label" size="small">
+        Upload
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => this.handleImageSelect(e)}
+        />
+      </Button>
+    </>
+  ) : (
+    row.ImageUrl ? (
+      <img 
+        src={row.ImageUrl} 
+        alt={row.Name} 
+        width={60} 
+        height={60} 
+        style={{ borderRadius: 8 }}
+      />
+    ) : "No Image"
+  )}
+</TableCell>
+
                   <TableCell>
                     {editRowId === row.Id ? (
                       <>

@@ -144,42 +144,100 @@ app.delete("/api/items/:id", async (req, res) => {
   }
 });
 
-app.put("/api/items/:id", async (req, res) => {
-  debugger;
+// app.put("/api/items/:id", async (req, res) => {
+//   debugger;
+//   const { id } = req.params;
+//   const { Name, Price, Description } = req.body;
+
+//   if (!Name || !Price) {
+//     return res.status(400).json({ error: "Name and Price are required" });
+//   }
+
+//   try {
+//     const pool = await db.poolPromise;
+//     const result = await pool.request()
+//       .input('Id', db.sql.Int, id)
+//       .input('Name', db.sql.NVarChar(100), Name)
+//       .input('Description', db.sql.NVarChar(500), Description || null)
+//       .input('Price', db.sql.Decimal(10, 2), Price)
+//       .query(`
+//         UPDATE dbo.MenuItems
+//         SET 
+//           Name = @Name, 
+//           Description = @Description, 
+//           Price = @Price,
+//           UpdatedDate = GETDATE()
+//         WHERE Id = @Id
+//       `);
+
+//     if (result.rowsAffected[0] === 0) {
+//       return res.status(404).json({ error: "Item not found" });
+//     }
+
+//     res.status(200).json({ message: 'Item updated successfully' });
+//   } catch (err) {
+//     console.error('Error updating item:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+app.put("/api/items/:id", upload.single("Image"), async (req, res) => {
   const { id } = req.params;
   const { Name, Price, Description } = req.body;
+  const imageFile = req.file ? req.file.filename : null;
 
   if (!Name || !Price) {
     return res.status(400).json({ error: "Name and Price are required" });
   }
 
+  let imagePath = null;
+
+  if (imageFile) {
+    imagePath = `/uploads/${imageFile}`;   // relative path for DB
+  }
+
   try {
     const pool = await db.poolPromise;
-    const result = await pool.request()
-      .input('Id', db.sql.Int, id)
-      .input('Name', db.sql.NVarChar(100), Name)
-      .input('Description', db.sql.NVarChar(500), Description || null)
-      .input('Price', db.sql.Decimal(10, 2), Price)
-      .query(`
-        UPDATE dbo.MenuItems
-        SET 
-          Name = @Name, 
-          Description = @Description, 
-          Price = @Price,
-          UpdatedDate = GETDATE()
-        WHERE Id = @Id
-      `);
+
+    // If image uploaded, update with image, else keep existing image
+    const query = `
+      UPDATE dbo.MenuItems
+      SET 
+        Name = @Name,
+        Description = @Description,
+        Price = @Price,
+        ${imageFile ? "ImageUrl = @ImageUrl," : ""}
+        UpdatedDate = GETDATE()
+      WHERE Id = @Id
+    `;
+
+    const request = pool.request()
+      .input("Id", db.sql.Int, id)
+      .input("Name", db.sql.NVarChar(100), Name)
+      .input("Description", db.sql.NVarChar(500), Description || null)
+      .input("Price", db.sql.Decimal(10, 2), Price);
+
+    if (imageFile) {
+      request.input("ImageUrl", db.sql.NVarChar(500), imagePath);
+    }
+
+    const result = await request.query(query);
 
     if (result.rowsAffected[0] === 0) {
       return res.status(404).json({ error: "Item not found" });
     }
 
-    res.status(200).json({ message: 'Item updated successfully' });
+    return res.status(200).json({
+      message: "Item updated successfully",
+      imageUrl: imagePath || null,
+    });
+
   } catch (err) {
-    console.error('Error updating item:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error updating item:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 app.post("/api/regpostdata", async (req, res) => {
   const { firstName, lastName, restaurantName, email, mobile, password } = req.body;
