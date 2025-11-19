@@ -1,14 +1,20 @@
+// --- IMPORTS ---
 import { Component } from 'react';
 import axios from 'axios';
 import {
   Button, Container, Box, TextField,
   Grid, Card, CardContent, Typography,
   Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Paper, TablePagination, TableSortLabel, InputAdornment
+  TableContainer, TableHead, TableRow, Paper,
+  TablePagination, TableSortLabel, InputAdornment
 } from '@mui/material';
+
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis,
+  CartesianGrid, Tooltip, Legend,
+  ResponsiveContainer
 } from 'recharts';
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from "@mui/icons-material/Search";
@@ -17,8 +23,9 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { withNavigation } from './withNavigation';
-import { blockBrowserBack } from "./BackButtonHelper";
+import { blockBrowserBack } from "./BackButtonHelper';
 
+// --- COMPONENT ---
 class Dashboard extends Component {
   cleanupBackBlock = null;
 
@@ -41,8 +48,9 @@ class Dashboard extends Component {
   componentDidMount() {
     axios.get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
       .then(response => {
-       // const menuItems = response.data;
-        const menuItems = Array.isArray(response.data)? response.data : response.data.items || response.data.data || [];
+        const menuItems = Array.isArray(response.data)
+          ? response.data
+          : response.data.items || response.data.data || [];
 
         const chartData = this.getChartData(menuItems);
         this.setState({ menuItems, chartData });
@@ -56,110 +64,91 @@ class Dashboard extends Component {
     if (this.cleanupBackBlock) this.cleanupBackBlock();
   }
 
-  getChartData = (menuItems) => {
-    if (!Array.isArray(menuItems)) return [];
-    return menuItems.map(item => ({
-      name: item.Name,
-      value: item.Price
-    }));
-  };
+  // -------------------- UTILITIES --------------------
+  getChartData = (menuItems) =>
+    Array.isArray(menuItems)
+      ? menuItems.map(item => ({ name: item.Name, value: item.Price }))
+      : [];
 
   handleEdit = (row) => this.setState({ editRowId: row.Id, editedRow: { ...row } });
   handleCancel = () => this.setState({ editRowId: null, editedRow: {} });
-  handleChange = (e) => this.setState({ editedRow: { ...this.state.editedRow, [e.target.name]: e.target.value } });
+  handleChange = (e) =>
+    this.setState({ editedRow: { ...this.state.editedRow, [e.target.name]: e.target.value } });
+
   gogenerateQR = () => this.props.navigate("/generateQR");
   goBack = () => this.props.navigate("/admindashboard");
 
-  // handleSave = (id) => {
-  //   const { Name, Price, Description } = this.state.editedRow;
-  //   if (!Name || !Price) return alert("Name and Price are required.");
-
-  //   axios.put(`https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`, { Name, Price, Description })
-  //     .then(res => {
-  //       alert(res.data.message || 'Item updated successfully');
-  //       const updatedItems = this.state.menuItems.map(item =>
-  //         item.Id === id ? { ...item, Name, Price, Description } : item
-  //       );
-  //       this.setState({
-  //         menuItems: updatedItems,
-  //         editRowId: null,
-  //         editedRow: {},
-  //         chartData: this.getChartData(updatedItems)
-  //       });
-  //     })
-  //     .catch(err => {
-  //       console.error('Update error:', err);
-  //       alert('Failed to update item.');
-  //     });
-  // };
-
+  // -------------------- SAVE WITH IMAGE --------------------
   handleSave = (id) => {
-  const { Name, Price, Description, ImageFile } = this.state.editedRow;
-  if (!Name || !Price) return alert("Name and Price are required.");
+    const { Name, Price, Description, ImageFile } = this.state.editedRow;
+    if (!Name || !Price) return alert("Name and Price are required.");
 
-  const formData = new FormData();
-  formData.append("Name", Name);
-  formData.append("Price", Price);
-  formData.append("Description", Description || "");
-  
-  if (ImageFile) {
-    formData.append("Image", ImageFile);
-  }
+    const formData = new FormData();
+    formData.append("Name", Name);
+    formData.append("Price", Price);
+    formData.append("Description", Description || "");
 
-  axios.put(
-    `https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`,
-    formData,
-    { headers: { "Content-Type": "multipart/form-data" } }
-  )
-    .then((res) => {
-      alert(res.data.message || "Item updated successfully");
-
-      const updatedItems = this.state.menuItems.map((item) =>
-        item.Id === id
-          ? { 
-              ...item, 
-              Name, 
-              Price, 
-              Description,
-              ImageUrl: res.data.imageUrl || item.ImageUrl  // backend returns image path
-            }
-          : item
-      );
-
-      this.setState({
-        menuItems: updatedItems,
-        editRowId: null,
-        editedRow: {},
-        chartData: this.getChartData(updatedItems)
-      });
-    })
-    .catch((err) => {
-      console.error("Update error:", err);
-      alert("Failed to update item.");
-    });
-};
-
-
-handleImageSelect = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const previewUrl = URL.createObjectURL(file);
-
-  this.setState({
-    editedRow: {
-      ...this.state.editedRow,
-      ImageFile: file,
-      previewImage: previewUrl,
+    if (ImageFile) {
+      formData.append("Image", ImageFile);
     }
-  });
-};
 
+    axios.put(
+      `https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    )
+      .then((res) => {
+        alert(res.data.message || "Item updated successfully");
+
+        const updatedItems = this.state.menuItems.map((item) =>
+          item.Id === id
+            ? {
+              ...item,
+              Name,
+              Price,
+              Description,
+              ImageUrl: res.data.imageUrl || item.ImageUrl,
+            }
+            : item
+        );
+
+        this.setState({
+          menuItems: updatedItems,
+          editRowId: null,
+          editedRow: {},
+          chartData: this.getChartData(updatedItems)
+        });
+      })
+      .catch((err) => {
+        console.error("Update error:", err);
+        alert("Failed to update item.");
+      });
+  };
+
+  // -------------------- IMAGE SELECT --------------------
+  handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+
+    this.setState({
+      editedRow: {
+        ...this.state.editedRow,
+        ImageFile: file,
+        previewImage: previewUrl,
+      }
+    });
+  };
+
+  // -------------------- DELETE --------------------
   deleteItem = (id) => {
     axios.delete(`https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/items/${id}`)
       .then(res => {
         alert(res.data.message || 'Item deleted');
+
         const filtered = this.state.menuItems.filter(item => item.Id !== id);
+
         this.setState({
           menuItems: filtered,
           chartData: this.getChartData(filtered)
@@ -171,16 +160,22 @@ handleImageSelect = (e) => {
       });
   };
 
+  // -------------------- SEARCH / SORT --------------------
   handleSearchChange = (e) => this.setState({ searchQuery: e.target.value, page: 0 });
   handleFilterChange = (e) => this.setState({ filterGroup: e.target.value, page: 0 });
+
   handleRequestSort = (property) => {
     const isAsc = this.state.orderBy === property && this.state.order === "asc";
     this.setState({ order: isAsc ? "desc" : "asc", orderBy: property });
   };
-  handleChangePage = (e, newPage) => this.setState({ page: newPage });
-  handleChangeRowsPerPage = (e) => this.setState({ rowsPerPage: parseInt(e.target.value, 10), page: 0 });
 
-  descendingComparator = (a, b, orderBy) => (b[orderBy] < a[orderBy] ? -1 : b[orderBy] > a[orderBy] ? 1 : 0);
+  handleChangePage = (e, newPage) => this.setState({ page: newPage });
+  handleChangeRowsPerPage = (e) =>
+    this.setState({ rowsPerPage: parseInt(e.target.value, 10), page: 0 });
+
+  descendingComparator = (a, b, orderBy) =>
+    b[orderBy] < a[orderBy] ? -1 : b[orderBy] > a[orderBy] ? 1 : 0;
+
   getComparator = (order, orderBy) =>
     order === "desc"
       ? (a, b) => this.descendingComparator(a, b, orderBy)
@@ -189,6 +184,7 @@ handleImageSelect = (e) => {
   getFilteredRows = () => {
     const { menuItems, searchQuery, filterGroup, order, orderBy } = this.state;
     let rows = [...menuItems];
+
     if (searchQuery.trim()) {
       rows = rows.filter(row =>
         Object.values(row).some(value =>
@@ -196,13 +192,17 @@ handleImageSelect = (e) => {
         )
       );
     }
-    if (filterGroup !== "All") rows = rows.filter(row => row.Name === filterGroup);
+
+    if (filterGroup !== "All")
+      rows = rows.filter(row => row.Name === filterGroup);
+
     rows.sort(this.getComparator(order, orderBy));
     return rows;
   };
 
+  // -------------------- TABLE RENDER --------------------
   renderTable() {
-    const { editRowId, editedRow, order, orderBy, page, rowsPerPage, searchQuery, filterGroup } = this.state;
+    const { editRowId, editedRow, order, orderBy, page, rowsPerPage } = this.state;
     const filteredRows = this.getFilteredRows();
     const paginatedRows = filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
@@ -218,9 +218,9 @@ handleImageSelect = (e) => {
             <TextField
               variant="outlined"
               placeholder="Search..."
-              value={searchQuery}
-              onChange={this.handleSearchChange}
               fullWidth
+              value={this.state.searchQuery}
+              onChange={this.handleSearchChange}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -230,13 +230,19 @@ handleImageSelect = (e) => {
               }}
             />
           </Grid>
+
           <Grid item xs={12} sm={6}>
-            <FormControl variant="outlined" fullWidth>
+            <FormControl fullWidth>
               <InputLabel>Filter by Item</InputLabel>
-              <Select value={filterGroup} onChange={this.handleFilterChange} label="Filter by Item">
+              <Select
+                label="Filter by Item"
+                value={this.state.filterGroup}
+                onChange={this.handleFilterChange}
+              >
                 <MenuItem value="All">All</MenuItem>
-                {Array.from(new Set(this.state.menuItems.map(item => item.Name))).map((group, index) => (
-                  <MenuItem key={index} value={group}>{group}</MenuItem>
+
+                {Array.from(new Set(this.state.menuItems.map(item => item.Name))).map((group, i) => (
+                  <MenuItem key={i} value={group}>{group}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -244,87 +250,119 @@ handleImageSelect = (e) => {
         </Grid>
 
         {/* Table */}
-        <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+        <TableContainer component={Paper}>
           <Table>
             <TableHead sx={{ backgroundColor: '#e8f5e9' }}>
               <TableRow>
                 <TableCell>
-                  <TableSortLabel active={orderBy === 'Name'} direction={orderBy === 'Name' ? order : "asc"} onClick={() => this.handleRequestSort('Name')}>
+                  <TableSortLabel
+                    active={orderBy === 'Name'}
+                    direction={orderBy === 'Name' ? order : "asc"}
+                    onClick={() => this.handleRequestSort('Name')}
+                  >
                     <b>Item Name</b>
                   </TableSortLabel>
                 </TableCell>
+
                 <TableCell>
-                  <TableSortLabel active={orderBy === 'Price'} direction={orderBy === 'Price' ? order : "asc"} onClick={() => this.handleRequestSort('Price')}>
+                  <TableSortLabel
+                    active={orderBy === 'Price'}
+                    direction={orderBy === 'Price' ? order : "asc"}
+                    onClick={() => this.handleRequestSort('Price')}
+                  >
                     <b>Price (₹)</b>
                   </TableSortLabel>
                 </TableCell>
+
                 <TableCell><b>Description</b></TableCell>
+                <TableCell><b>Image</b></TableCell>
                 <TableCell><b>Actions</b></TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {paginatedRows.map((row, index) => (
-                <TableRow key={row.Id} sx={{ "&:hover": { backgroundColor: "#f1f8e9" } }}>
+              {paginatedRows.map((row) => (
+                <TableRow key={row.Id}>
+                  {/* NAME */}
                   <TableCell>
                     {editRowId === row.Id ? (
-                      <TextField name="Name" value={editedRow.Name || ''} onChange={this.handleChange} size="small" />
+                      <TextField
+                        name="Name"
+                        value={editedRow.Name || ""}
+                        onChange={this.handleChange}
+                        size="small"
+                      />
                     ) : row.Name}
                   </TableCell>
+
+                  {/* PRICE */}
                   <TableCell>
                     {editRowId === row.Id ? (
-                      <TextField name="Price" type="number" value={editedRow.Price || ''} onChange={this.handleChange} size="small" />
+                      <TextField
+                        name="Price"
+                        type="number"
+                        value={editedRow.Price || ""}
+                        onChange={this.handleChange}
+                        size="small"
+                      />
                     ) : `₹${row.Price}`}
                   </TableCell>
+
+                  {/* DESCRIPTION */}
                   <TableCell>
                     {editRowId === row.Id ? (
-                      <TextField name="Description" value={editedRow.Description || ''} onChange={this.handleChange} size="small" />
+                      <TextField
+                        name="Description"
+                        value={editedRow.Description || ""}
+                        onChange={this.handleChange}
+                        size="small"
+                      />
                     ) : row.Description}
                   </TableCell>
+
+                  {/* IMAGE CELL — FIXED */}
                   <TableCell>
                     {editRowId === row.Id ? (
-                       <>
-                   {editedRow.previewImage ? (
-                      <img 
-                          src={editedRow.previewImage} 
-                          alt="preview" 
-                          width={60} 
-                          height={60} 
-                          style={{ borderRadius: 8, marginBottom: 5 }}
-                       />
-                   ) : row.ImageUrl ? (
-        <img 
-          src={row.ImageUrl} 
-          alt={row.Name} 
-          width={60} 
-          height={60} 
-          style={{ borderRadius: 8, marginBottom: 5 }}
-        />
-      ) : null}
+                      <>
+                        {editedRow.previewImage ? (
+                          <img
+                            src={editedRow.previewImage}
+                            width={60}
+                            height={60}
+                            style={{ borderRadius: 8, marginBottom: 5 }}
+                          />
+                        ) : row.ImageUrl ? (
+                          <img
+                            src={row.ImageUrl}
+                            width={60}
+                            height={60}
+                            style={{ borderRadius: 8, marginBottom: 5 }}
+                          />
+                        ) : null}
 
-      <Button variant="outlined" component="label" size="small">
-        Upload
-        <input
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={(e) => this.handleImageSelect(e)}
-        />
-      </Button>
-    </>
-  ) : (
-    row.ImageUrl ? (
-      <img 
-        src={row.ImageUrl} 
-        alt={row.Name} 
-        width={60} 
-        height={60} 
-        style={{ borderRadius: 8 }}
-      />
-    ) : "No Image"
-  )}
-</TableCell>
+                        <Button variant="outlined" component="label" size="small">
+                          Upload
+                          <input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            onChange={this.handleImageSelect}
+                          />
+                        </Button>
+                      </>
+                    ) : (
+                      row.ImageUrl ? (
+                        <img
+                          src={row.ImageUrl}
+                          width={60}
+                          height={60}
+                          style={{ borderRadius: 8 }}
+                        />
+                      ) : "No Image"
+                    )}
+                  </TableCell>
 
+                  {/* ACTIONS */}
                   <TableCell>
                     {editRowId === row.Id ? (
                       <>
@@ -333,10 +371,11 @@ handleImageSelect = (e) => {
                       </>
                     ) : (
                       <>
-                        <Button variant="contained" onClick={() => this.handleEdit(row)} size="small" color="primary" sx={{ mr: 1 }}>
+                        <Button variant="contained" size="small" color="primary" onClick={() => this.handleEdit(row)} sx={{ mr: 1 }}>
                           <EditIcon fontSize="small" /> Edit
                         </Button>
-                        <Button variant="outlined" color="error" onClick={() => this.deleteItem(row.Id)} size="small">
+
+                        <Button variant="outlined" size="small" color="error" onClick={() => this.deleteItem(row.Id)}>
                           <DeleteIcon fontSize="small" /> Delete
                         </Button>
                       </>
@@ -348,12 +387,13 @@ handleImageSelect = (e) => {
           </Table>
         </TableContainer>
 
+        {/* Pagination */}
         <TablePagination
           component="div"
           count={filteredRows.length}
           page={page}
-          onPageChange={this.handleChangePage}
           rowsPerPage={rowsPerPage}
+          onPageChange={this.handleChangePage}
           onRowsPerPageChange={this.handleChangeRowsPerPage}
           rowsPerPageOptions={[5, 10, 25]}
         />
@@ -361,18 +401,19 @@ handleImageSelect = (e) => {
     );
   }
 
+  // -------------------- BAR CHART --------------------
   renderBarChart() {
-    const { chartData } = this.state;
     return (
       <Card elevation={4} sx={{ borderRadius: 3, p: 3 }}>
         <Typography variant="h6" gutterBottom color="primary" fontWeight="bold">
           📊 Menu Item Price Overview
         </Typography>
+
         <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
+          <BarChart data={this.state.chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
-            <YAxis label={{ value: 'Price ₹', angle: -90, position: 'insideLeft' }} />
+            <YAxis label={{ value: "Price ₹", angle: -90, position: "insideLeft" }} />
             <Tooltip />
             <Legend />
             <Bar dataKey="value" fill="#4caf50" radius={[8, 8, 0, 0]} />
@@ -382,11 +423,12 @@ handleImageSelect = (e) => {
     );
   }
 
+  // -------------------- MAIN RENDER --------------------
   render() {
     return (
       <Box sx={{ backgroundColor: '#f9fafb', minHeight: '100vh', py: 5 }}>
         <Container>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 4, textAlign: 'center', color: "#2e7d32" }}>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', color: "#2e7d32" }}>
             🌿 Restaurant Admin Dashboard
           </Typography>
 
@@ -395,14 +437,10 @@ handleImageSelect = (e) => {
             <Grid item xs={12} md={5}>{this.renderBarChart()}</Grid>
           </Grid>
 
-          {/* Bottom Buttons */}
+          {/* Footer Buttons */}
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, gap: 2 }}>
-            <Button variant="contained" color="primary" onClick={this.goBack} sx={{ px: 4, py: 1.5, borderRadius: 3 }}>
-              Back
-            </Button>
-            <Button variant="contained" color="success" onClick={this.gogenerateQR} sx={{ px: 4, py: 1.5, borderRadius: 3 }}>
-              Generate QR Code
-            </Button>
+            <Button variant="contained" onClick={this.goBack} sx={{ px: 4, py: 1.5 }}>Back</Button>
+            <Button variant="contained" color="success" onClick={this.gogenerateQR} sx={{ px: 4, py: 1.5 }}>Generate QR Code</Button>
           </Box>
         </Container>
       </Box>
