@@ -205,6 +205,8 @@ class Dashboard extends Component {
     const { editRowId, editedRow, order, orderBy, page, rowsPerPage } = this.state;
     const filteredRows = this.getFilteredRows();
     const paginatedRows = filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    const BASE_URL = "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/";
+
 
     return (
       <Card elevation={4} sx={{ borderRadius: 3, p: 3, background: "linear-gradient(145deg, #ffffff, #f3f4f6)" }}>
@@ -321,46 +323,42 @@ class Dashboard extends Component {
                   </TableCell>
 
                   {/* IMAGE CELL — FIXED */}
-                  <TableCell>
-                    {editRowId === row.Id ? (
-                      <>
-                        {editedRow.previewImage ? (
-                          <img
-                            src={editedRow.previewImage}
-                            width={60}
-                            height={60}
-                            style={{ borderRadius: 8, marginBottom: 5 }}
-                          />
-                        ) : row.ImageUrl ? (
-                          <img
-                            src={row.ImageUrl}
-                            width={60}
-                            height={60}
-                            style={{ borderRadius: 8, marginBottom: 5 }}
-                          />
-                        ) : null}
+                 <TableCell>
+  {editRowId === row.Id ? (
+    <>
+      {editedRow.previewImage ? (
+        <img
+          src={editedRow.previewImage}
+          width={60}
+          height={60}
+          style={{ borderRadius: 8, marginBottom: 5 }}
+        />
+      ) : row.ImageUrl ? (
+        <img
+          src={`${BASE_URL}${row.ImageUrl.replace(/\\/g, "/")}`}
+          width={60}
+          height={60}
+          style={{ borderRadius: 8, marginBottom: 5 }}
+        />
+      ) : null}
 
-                        <Button variant="outlined" component="label" size="small">
-                          Upload
-                          <input
-                            type="file"
-                            accept="image/*"
-                            hidden
-                            onChange={this.handleImageSelect}
-                          />
-                        </Button>
-                      </>
-                    ) : (
-                      row.ImageUrl ? (
-                        <img
-                          src={row.ImageUrl}
-                          width={60}
-                          height={60}
-                          style={{ borderRadius: 8 }}
-                        />
-                      ) : "No Image"
-                    )}
-                  </TableCell>
+      <Button variant="outlined" component="label" size="small">
+        Upload
+        <input type="file" accept="image/*" hidden onChange={this.handleImageSelect} />
+      </Button>
+    </>
+  ) : (
+    row.ImageUrl ? (
+      <img
+        src={`${BASE_URL}${row.ImageUrl.replace(/\\/g, "/")}`}
+        width={60}
+        height={60}
+        style={{ borderRadius: 8 }}
+      />
+    ) : "No Image"
+  )}
+</TableCell>
+
 
                   {/* ACTIONS */}
                   <TableCell>
