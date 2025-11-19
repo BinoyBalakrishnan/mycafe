@@ -60,6 +60,32 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
+app.post("/api/postdata", upload.single("image"), async (req, res) => {
+  try {
+    const { name, description, price } = req.body;
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+
+    const pool = await db.poolPromise;
+    await pool
+      .request()
+      .input("Name", db.sql.NVarChar, name)
+      .input("Description", db.sql.NVarChar, description)
+      .input("Price", db.sql.Decimal(10, 2), price)
+      .input("ImageUrl", db.sql.NVarChar, imageUrl)
+      .query(`
+        INSERT INTO dbo.MenuItems (Name, Description, Price, ImageUrl, CreatedDate)
+        VALUES (@Name, @Description, @Price, @ImageUrl, GETDATE())
+      `);
+
+    res.status(200).json({ message: "Item added successfully" });
+  } catch (error) {
+    console.error("Error inserting item:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
