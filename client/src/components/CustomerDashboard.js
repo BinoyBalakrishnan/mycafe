@@ -28,26 +28,49 @@ class CustomerMenu extends Component {
     super(props);
     this.state = {
       menuItems: [],
+      filteredItems: [],
       cart: [],
       cartOpen: false,
+      searchQuery: "",
+      categories: [],
+      selectedCategory: "All",
     };
   }
 
   componentDidMount() {
+    // axios
+    //   .get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
+    //   .then((response) => {
+    //     const baseURL = "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net";
+    //     const menuItems = response.data.map((item) => ({
+    //       ...item,
+    //       ImageUrl: item.ImageUrl
+    //         ? item.ImageUrl.startsWith("http")
+    //           ? item.ImageUrl
+    //           : `${baseURL}${item.ImageUrl.startsWith("/") ? "" : "/"}${item.ImageUrl}`
+    //         : "https://via.placeholder.com/400x250?text=No+Image",
+    //     }));
+    //     this.setState({ menuItems });
+    //   })
     axios
-      .get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
-      .then((response) => {
-        const baseURL = "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net";
-        const menuItems = response.data.map((item) => ({
-          ...item,
-          ImageUrl: item.ImageUrl
-            ? item.ImageUrl.startsWith("http")
-              ? item.ImageUrl
-              : `${baseURL}${item.ImageUrl.startsWith("/") ? "" : "/"}${item.ImageUrl}`
-            : "https://via.placeholder.com/400x250?text=No+Image",
-        }));
-        this.setState({ menuItems });
-      })
+  .get("https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net/api/data")
+  .then((response) => {
+    const baseURL = "https://mycafe-backend-d4ddd9e2a6bfcfe7.centralindia-01.azurewebsites.net";
+
+    const menuItems = response.data.map((item) => ({
+      ...item,
+      ImageUrl: item.ImageUrl
+        ? item.ImageUrl.startsWith("http")
+          ? item.ImageUrl
+          : `${baseURL}${item.ImageUrl.startsWith("/") ? "" : "/"}${item.ImageUrl}`
+        : "https://via.placeholder.com/400x250?text=No+Image",
+      Category: item.Category || "Others"
+    }));
+
+    const categories = ["All", ...new Set(menuItems.map((i) => i.Category))];
+
+    this.setState({ menuItems, filteredItems: menuItems, categories });
+  })
       .catch((error) => {
         console.error("Error fetching menu:", error);
       });
@@ -89,7 +112,27 @@ class CustomerMenu extends Component {
       return { cart: updatedCart };
     });
   };
+filterMenu = () => {
+  const { menuItems, searchQuery, selectedCategory } = this.state;
 
+  const filtered = menuItems.filter((item) => {
+    const matchSearch = item.Name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchCategory =
+      selectedCategory === "All" || item.Category === selectedCategory;
+
+    return matchSearch && matchCategory;
+  });
+
+  this.setState({ filteredItems: filtered });
+};
+
+handleSearch = (e) => {
+  this.setState({ searchQuery: e.target.value }, this.filterMenu);
+};
+
+handleCategoryChange = (e) => {
+  this.setState({ selectedCategory: e.target.value }, this.filterMenu);
+};
   removeFromCart = (itemId) => {
     this.setState((prevState) => ({
       cart: prevState.cart.filter((cartItem) => cartItem.Id !== itemId),
@@ -145,257 +188,288 @@ logout = () => {
     const { menuItems, cart, cartOpen } = this.state;
 
     return (
+  <Box
+    sx={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #eef2f3, #e3f2fd)",
+      pb: 6,
+    }}
+  >
+    <Container maxWidth="lg">
+
+      {/* Sticky Header */}
       <Box
         sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #f7f8fa, #e3f2fd)",
-          py: 4,
+          position: "sticky",
+          top: 0,
+          zIndex: 20,
+          background: "white",
+          py: 2,
+          mb: 3,
+          borderRadius: 3,
+          boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
         }}
       >
-        <Container>
-          {/* Header */}
-          {/* <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              color="primary"
-              sx={{
-                textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
-              }}
-            >
-              🍽️ MyCafe Menu
-            </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            sx={{
+              color: "#0077c2",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            🍽️ MyCafe
+          </Typography>
 
+          <Box display="flex" alignItems="center" gap={2}>
+
+            {/* Floating Cart Badge */}
             <IconButton
-              color="primary"
               onClick={() => this.toggleCart(true)}
               sx={{
-                position: "relative",
                 background: "#fff",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
-                "&:hover": { backgroundColor: "#f0f0f0" },
+                borderRadius: "50%",
+                boxShadow: "0 3px 12px rgba(0,0,0,0.2)",
+                "&:hover": { backgroundColor: "#f1f1f1" },
               }}
             >
               <Badge
                 badgeContent={cart.length}
                 color="error"
-                sx={{ "& .MuiBadge-badge": { fontSize: "0.75rem" } }}
               >
-                <ShoppingCartIcon fontSize="large" />
+                <ShoppingCartIcon sx={{ fontSize: 30 }} />
               </Badge>
             </IconButton>
-          </Box> */}
 
-<Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-  <Typography
-    variant="h4"
-    fontWeight="bold"
-    color="primary"
-    sx={{ textShadow: "1px 1px 2px rgba(0,0,0,0.1)" }}
+            {/* Logout */}
+            <Button
+              variant="contained"
+              color="error"
+              onClick={this.logout}
+              sx={{
+                px: 2.5,
+                textTransform: "none",
+                fontWeight: "bold",
+                borderRadius: 3,
+              }}
+            >
+              Logout
+            </Button>
+
+          </Box>
+        </Box>
+      </Box>
+<Box
+  display="flex"
+  flexDirection={{ xs: "column", sm: "row" }}
+  gap={2}
+  mb={3}
+>
+  {/* Search */}
+  <input
+    type="text"
+    placeholder="Search menu..."
+    value={this.state.searchQuery}
+    onChange={this.handleSearch}
+    style={{
+      flex: 1,
+      padding: "12px",
+      borderRadius: "10px",
+      border: "1px solid #ccc",
+      fontSize: "16px",
+    }}
+  />
+
+  {/* Category Dropdown */}
+  <select
+    value={this.state.selectedCategory}
+    onChange={this.handleCategoryChange}
+    style={{
+      flex: 1,
+      padding: "12px",
+      borderRadius: "10px",
+      border: "1px solid #ccc",
+      fontSize: "16px",
+    }}
   >
-    🍽️ MyCafe Menu
-  </Typography>
-
-  <Box display="flex" alignItems="center">
-    {/* Cart Button */}
-    <IconButton
-      color="primary"
-      onClick={() => this.toggleCart(true)}
-      sx={{
-        position: "relative",
-        background: "#fff",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
-        "&:hover": { backgroundColor: "#f0f0f0" },
-      }}
-    >
-      <Badge
-        badgeContent={this.state.cart.length}
-        color="error"
-        sx={{ "& .MuiBadge-badge": { fontSize: "0.75rem" } }}
-      >
-        <ShoppingCartIcon fontSize="large" />
-      </Badge>
-    </IconButton>
-
-    {/* Logout Button */}
-    <Button
-      variant="contained"
-      color="error"
-      onClick={this.logout}
-      sx={{
-        ml: 2,
-        borderRadius: 3,
-        textTransform: "none",
-        fontWeight: "bold",
-        background: "linear-gradient(90deg, #d32f2f, #f44336)",
-        "&:hover": {
-          background: "linear-gradient(90deg, #f44336, #d32f2f)",
-        },
-      }}
-    >
-      🚪 Logout
-    </Button>
-  </Box>
+    {this.state.categories.map((cat) => (
+      <option key={cat} value={cat}>
+        {cat}
+      </option>
+    ))}
+  </select>
 </Box>
+      {/* Responsive Menu Grid */}
+      <Grid container spacing={3}>
+        {this.state.filteredItems.map((item, index) => (
+          <Grid item xs={12} sm={6} md={4} key={item.Id}>
+            <Grow in timeout={400 + index * 100}>
+              <Card
+                sx={{
+                  borderRadius: 4,
+                  overflow: "hidden",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+                  transition: "0.35s",
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    boxShadow: "0 16px 30px rgba(0,0,0,0.18)",
+                  },
+                }}
+              >
+                {/* Auto responsive images */}
+                <CardMedia
+                  component="img"
+                  image={item.ImageUrl}
+                  alt={item.Name}
+                  sx={{
+                    height: { xs: 180, sm: 200, md: 220 },
+                    objectFit: "cover",
+                  }}
+                />
 
-          {/* Menu Grid */}
-          <Grid container spacing={3}>
-            {menuItems.map((item, index) => (
-              <Grid item xs={12} sm={6} md={4} key={item.Id}>
-                <Grow in timeout={500 + index * 100}>
-                  <Card
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" fontWeight="600" gutterBottom>
+                    {item.Name}
+                  </Typography>
+
+                  <Typography variant="body2" color="text.secondary" mb={1}>
+                    {item.Description || "Freshly made with premium ingredients!"}
+                  </Typography>
+
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    color="success.main"
+                    sx={{ mb: 2 }}
+                  >
+                    ₹{item.Price}
+                  </Typography>
+
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => this.addToCart(item)}
                     sx={{
-                      borderRadius: 3,
-                      overflow: "hidden",
-                      transition: "0.4s",
-                      boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+                      py: 1.2,
+                      borderRadius: 4,
+                      textTransform: "none",
+                      fontSize: "1rem",
+                      fontWeight: "bold",
+                      background: "linear-gradient(90deg, #4caf50, #66bb6a)",
                       "&:hover": {
-                        transform: "translateY(-6px)",
-                        boxShadow: "0 12px 30px rgba(0,0,0,0.2)",
+                        background: "linear-gradient(90deg, #66bb6a, #4caf50)",
                       },
                     }}
                   >
-                    <CardMedia
-                      component="img"
-                      height="200"
-                      image={item.ImageUrl}
-                      alt={item.Name}
-                    />
-                    <CardContent>
-                      <Typography variant="h6" fontWeight="600">
-                        {item.Name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        {item.Description || "Delicious and freshly made!"}
-                      </Typography>
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        color="success.main"
-                        mb={1}
-                      >
-                        ₹{item.Price}
-                      </Typography>
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        onClick={() => this.addToCart(item)}
-                        sx={{
-                          borderRadius: 3,
-                          background: "linear-gradient(90deg, #43a047, #66bb6a)",
-                          fontWeight: "bold",
-                          textTransform: "none",
-                          "&:hover": {
-                            background: "linear-gradient(90deg, #66bb6a, #43a047)",
-                          },
-                        }}
-                      >
-                        🛒 Add to Cart
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grow>
-              </Grid>
-            ))}
+                    🛒 Add to Cart
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grow>
           </Grid>
+        ))}
+      </Grid>
 
-          {/* Floating Drawer Cart */}
-          <Drawer
-            anchor="right"
-            open={cartOpen}
-            onClose={() => this.toggleCart(false)}
-            sx={{
-              "& .MuiDrawer-paper": {
-                width: { xs: "90%", sm: 400 },
-                borderTopLeftRadius: 16,
-                borderBottomLeftRadius: 16,
-                p: 2,
-                background: "#f9f9f9",
-              },
-            }}
-          >
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h6" fontWeight="bold" color="primary">
-                🛍 Your Cart
-              </Typography>
-              <IconButton onClick={() => this.toggleCart(false)}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
+      {/* Right Drawer Cart */}
+      <Drawer
+        anchor="right"
+        open={cartOpen}
+        onClose={() => this.toggleCart(false)}
+        sx={{
+          "& .MuiDrawer-paper": {
+            width: { xs: "92%", sm: 380 },
+            borderTopLeftRadius: 20,
+            borderBottomLeftRadius: 20,
+            p: 3,
+            background: "#fefefe",
+          },
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6" fontWeight="bold">
+            🛍 Your Cart
+          </Typography>
+          <IconButton onClick={() => this.toggleCart(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
 
-            <Divider sx={{ mb: 2 }} />
+        <Divider sx={{ mb: 2 }} />
 
-            {cart.length === 0 ? (
-              <Typography align="center" color="text.secondary">
-                Your cart is empty
-              </Typography>
-            ) : (
-              <>
-                {cart.map((item) => (
-                  <Box
-                    key={item.Id}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mb={2}
-                  >
-                    <Box>
-                      <Typography fontWeight="600">{item.Name}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        ₹{item.Price} × {item.Quantity}
-                      </Typography>
-                    </Box>
-                    <Box display="flex" alignItems="center">
-                      <IconButton
-                        color="error"
-                        size="small"
-                        onClick={() => this.decreaseQuantity(item.Id)}
-                      >
-                        <RemoveIcon />
-                      </IconButton>
-                      <Typography mx={1}>{item.Quantity}</Typography>
-                      <IconButton
-                        color="primary"
-                        size="small"
-                        onClick={() => this.addToCart(item)}
-                      >
-                        <AddIcon />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        size="small"
-                        onClick={() => this.removeFromCart(item.Id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                ))}
+        {cart.length === 0 ? (
+          <Typography align="center" color="text.secondary">
+            Your cart is empty
+          </Typography>
+        ) : (
+          <>
+            {cart.map((item) => (
+              <Box
+                key={item.Id}
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
+              >
+                <Box>
+                  <Typography fontWeight="600">{item.Name}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    ₹{item.Price} × {item.Quantity}
+                  </Typography>
+                </Box>
 
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" align="center" fontWeight="bold" color="text.primary">
-                  Total: ₹{this.calculateTotal()}
-                </Typography>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    mt: 2,
-                    borderRadius: 5,
-                    background: "linear-gradient(90deg, #43a047, #66bb6a)",
-                    fontWeight: "bold",
-                    textTransform: "none",
-                  }}
-                  onClick={this.placeOrder}
-                >
-                  ✅ Place Order
-                </Button>
-              </>
-            )}
-          </Drawer>
-        </Container>
-      </Box>
-    );
+                <Box display="flex" alignItems="center">
+                  <IconButton size="small" color="error" onClick={() => this.decreaseQuantity(item.Id)}>
+                    <RemoveIcon />
+                  </IconButton>
+
+                  <Typography mx={1}>{item.Quantity}</Typography>
+
+                  <IconButton size="small" color="primary" onClick={() => this.addToCart(item)}>
+                    <AddIcon />
+                  </IconButton>
+
+                  <IconButton size="small" color="error" onClick={() => this.removeFromCart(item.Id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+            ))}
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="h6" align="center" fontWeight="bold">
+              Total: ₹{this.calculateTotal()}
+            </Typography>
+
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{
+                mt: 2,
+                py: 1.3,
+                borderRadius: 4,
+                fontSize: "1rem",
+                fontWeight: "bold",
+                textTransform: "none",
+                background: "linear-gradient(90deg, #4caf50, #66bb6a)",
+              }}
+              onClick={this.placeOrder}
+            >
+              ✔️ Place Order
+            </Button>
+          </>
+        )}
+      </Drawer>
+    </Container>
+  </Box>
+);
+
   }
 }
 
