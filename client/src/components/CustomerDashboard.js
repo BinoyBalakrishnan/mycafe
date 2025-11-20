@@ -198,75 +198,78 @@ logout = () => {
     <Container maxWidth="lg">
 
       {/* Sticky Header */}
-      <Box
+  <Box
+  sx={{
+    position: "sticky",
+    top: 0,
+    zIndex: 20,
+    background: "white",
+    py: { xs: 1.5, sm: 2 },
+    mb: 3,
+    borderRadius: 3,
+    boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
+  }}
+>
+  <Box
+    display="flex"
+    flexDirection={{ xs: "column", sm: "row" }}
+    justifyContent="space-between"
+    alignItems={{ xs: "flex-start", sm: "center" }}
+    gap={{ xs: 1.5, sm: 0 }}
+  >
+    <Typography
+      variant="h5"
+      fontWeight="bold"
+      sx={{
+        color: "#0077c2",
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+      }}
+    >
+      🍽️ MyCafe
+    </Typography>
+
+    <Box display="flex" alignItems="center" gap={2}>
+      <IconButton
+        onClick={() => this.toggleCart(true)}
         sx={{
-          position: "sticky",
-          top: 0,
-          zIndex: 20,
-          background: "white",
-          py: 2,
-          mb: 3,
-          borderRadius: 3,
-          boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
+          background: "#fff",
+          borderRadius: "50%",
+          boxShadow: "0 3px 12px rgba(0,0,0,0.2)",
+          "&:hover": { backgroundColor: "#f1f1f1" },
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            sx={{
-              color: "#0077c2",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            🍽️ MyCafe
-          </Typography>
+        <Badge badgeContent={cart.length} color="error">
+          <ShoppingCartIcon sx={{ fontSize: 30 }} />
+        </Badge>
+      </IconButton>
 
-          <Box display="flex" alignItems="center" gap={2}>
+      <Button
+        variant="contained"
+        color="error"
+        onClick={this.logout}
+        sx={{
+          px: 2.5,
+          textTransform: "none",
+          fontWeight: "bold",
+          borderRadius: 3,
+        }}
+      >
+        Logout
+      </Button>
+    </Box>
+  </Box>
+</Box>
 
-            {/* Floating Cart Badge */}
-            <IconButton
-              onClick={() => this.toggleCart(true)}
-              sx={{
-                background: "#fff",
-                borderRadius: "50%",
-                boxShadow: "0 3px 12px rgba(0,0,0,0.2)",
-                "&:hover": { backgroundColor: "#f1f1f1" },
-              }}
-            >
-              <Badge
-                badgeContent={cart.length}
-                color="error"
-              >
-                <ShoppingCartIcon sx={{ fontSize: 30 }} />
-              </Badge>
-            </IconButton>
-
-            {/* Logout */}
-            <Button
-              variant="contained"
-              color="error"
-              onClick={this.logout}
-              sx={{
-                px: 2.5,
-                textTransform: "none",
-                fontWeight: "bold",
-                borderRadius: 3,
-              }}
-            >
-              Logout
-            </Button>
-
-          </Box>
-        </Box>
-      </Box>
 <Box
   display="flex"
   flexDirection={{ xs: "column", sm: "row" }}
   gap={2}
-  mb={3}
+  mb={4}
+  sx={{
+    alignItems: "center",
+  }}
 >
   {/* Search */}
   <input
@@ -276,6 +279,7 @@ logout = () => {
     onChange={this.handleSearch}
     style={{
       flex: 1,
+      width: "100%",
       padding: "12px",
       borderRadius: "10px",
       border: "1px solid #ccc",
@@ -289,10 +293,12 @@ logout = () => {
     onChange={this.handleCategoryChange}
     style={{
       flex: 1,
+      width: "100%",
       padding: "12px",
       borderRadius: "10px",
       border: "1px solid #ccc",
       fontSize: "16px",
+      backgroundColor: "white",
     }}
   >
     {this.state.categories.map((cat) => (
@@ -302,6 +308,7 @@ logout = () => {
     ))}
   </select>
 </Box>
+
       {/* Responsive Menu Grid */}
       <Grid container spacing={3}>
         {this.state.filteredItems.map((item, index) => (
@@ -324,14 +331,16 @@ logout = () => {
               >
                 {/* Auto responsive images */}
                 <CardMedia
-                  component="img"
-                  image={item.ImageUrl}
-                  alt={item.Name}
-                  sx={{
-                    height: { xs: 180, sm: 200, md: 220 },
-                    objectFit: "cover",
-                  }}
-                />
+  component="img"
+  image={item.ImageUrl}
+  alt={item.Name}
+  sx={{
+    width: "100%",
+    height: { xs: 180, sm: 200, md: 220 },
+    objectFit: "cover",
+    borderBottom: "1px solid #eee",
+  }}
+/>
 
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6" fontWeight="600" gutterBottom>
