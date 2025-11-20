@@ -227,7 +227,7 @@ logout = () => {
         gap: 1,
       }}
     >
-      🍽️ MyCafe
+      Bin Aura - Restaurant
     </Typography>
 
     <Box display="flex" alignItems="center" gap={2}>
